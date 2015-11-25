@@ -1,0 +1,59 @@
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of version 2 of the GNU General Public
+# License as published by the Free Software Foundation.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public
+# License along with this program; if not, write to the Free
+# Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307 USA
+
+import os, re
+import sys
+import psycopg2
+from string import upper
+
+# So,we start by processing the subfolders in libfiles, and making a dictionary of those files
+patron_file_path = '/opt/flatfiles/'
+list_of_files = {}
+
+for foo in os.listdir(patron_file_path):
+	list_of_files[foo] = filter(lambda x: x[0] != '.', os.listdir(patron_file_path + foo))
+
+print list_of_files
+
+libraryPatterns = {
+	#'SITE2': (r'SITE2\d{6}', r'21111\d{9}')
+}
+
+for library, files in list_of_files.iteritems():
+	all_valid_records = [];
+	for file in files:
+		the_current_file = open(patron_file_path + library + "/" + file, 'r')
+		current_file_records = the_current_file.read()
+		
+		for regex in libraryPatterns[upper(library)]:
+			print library + ": " + regex
+			this_regex = re.compile(regex, re.IGNORECASE | re.MULTILINE)
+			all_valid_records.extend(this_regex.findall(current_file_records))
+	
+	print library + " records: " + str(len(all_valid_records)) + '\n'
+
+	if len(all_valid_records) != 0:
+		pg_conn = psycopg2.connect("host=localhost dbname=barcodes user=postgres password=password")
+		cur = pg_conn.cursor()
+
+		cur.execute("DELETE FROM barcodes_by_symbol WHERE symbol = %s;", (upper(library), ))
+		pg_conn.commit()
+		
+		for line in all_valid_records:
+			cur.execute("INSERT INTO barcodes_by_symbol (barcode, symbol) VALUES (%s, %s);", (line, upper(library)))
+
+		pg_conn.commit()
+
+		cur.close()
+		pg_conn.close()

@@ -926,6 +926,9 @@ sub summary_info {
 sub handle_patron_info {
     my ($self, $server) = @_;
     my $ils = $server->{ils};
+
+    syslog("LOG_DEBUG", $ils);
+
     my ($lang, $trans_date, $summary) = @{$self->{fixed_fields}};
     my $fields = $self->{fields};
     my ($inst_id, $patron_id, $terminal_pwd, $patron_pwd, $start, $end);
@@ -938,7 +941,16 @@ sub handle_patron_info {
     $start = $fields->{(FID_START_ITEM)};
     $end = $fields->{(FID_END_ITEM)};
 
-    $patron = $ils->find_patron($patron_id);
+    if (defined($patron_pwd))
+    {
+	syslog("LOG_DEBUG", "patron_pwd defined: $patron_id, $patron_pwd");
+        $patron = $ils->find_patron($patron_id, $patron_pwd);
+    }
+    else
+    {
+	syslog("LOG_DEBUG", "patron_pwd not defined: $patron_id");
+        $patron = $ils->find_patron($patron_id);
+    }
 
     $resp = (PATRON_INFO_RESP);
     if ($patron) {

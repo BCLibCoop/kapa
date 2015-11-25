@@ -49,13 +49,10 @@
   </listeners>
 
   <accounts>
-      <login id="scclient" password="clientpwd" institution="UWOLS">
-      </login>
-      <login id="scclient-2" password="clientpwd-2"
-             institution="UWOLS" />
-      <login id="lpl-sc" password="1234" institution="LPL" />
-      <login id="lpl-sc-beacock" password="xyzzy"
-             delimiter="|" error-detect="enabled" institution="LPL" />
+      <login id="SITE1"  password="SITE1"  institution="SITE1" />
+      <login id="SITE2"  password="SITE2"  institution="SITE2" />
+      <login id="SITE3"  password="SITE3"  institution="SITE3" />
+      <login id="SITE4"  password="SITE4"  institution="SITE4" />
   </accounts>
 
 <!-- Institution tags will hold stuff used to interface to -->
@@ -64,14 +61,23 @@
 <!-- needs to be one institution stanza for each institution -->
 <!-- named in the accounts above. -->
 <institutions>
-    <institution id="UWOLS" implementation="ILS" parms="">
-          <policy checkin="true" renewal="false"
-	  	  status_update="false" offline="false"
-		  timeout="600"
-	  	  retries="3" />
+    <institution id="SITE1" implementation="KAPA::Postgres">
+        <policy retries="3" timeout="60" />
+        <config server="localhost" db_username="postgres"
+            db_password="password" database="barcodes" />
     </institution>
-
-    <institution id="LPL" implementation="ILS">
+    <institution id="SITE2" implementation="KAPA::PatternMatch">
+        <policy retries="3" timeout="60" />
+        <config pattern="SITE2[0-9]{6}|21111[0-9]{9}" />
     </institution>
+    <institution id="SITE3" implementation="KAPA::EZProxy">
+        <policy retries="3" timeout="60" />
+        <config server="http://example.com" proxy_login="http://proxy.example.com/login" proxy_url="http://proxy.example.com/mygroups/" />
+    </institution>
+    <institution id="SITE4" implementation="KAPA::FreeTDS">
+        <policy retries="3" timeout="60" />
+        <config server="SITE4" db_username="freetds_user"
+            db_password="password" database="freetds_db" />
+    </institution> 
 </institutions>
 </acsconfig>
