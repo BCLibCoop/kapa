@@ -77,7 +77,8 @@ uploaded to /opt/flatfiles, deletes any existing barcodes for that
 library from the database, and imports the new ones.  The second command
 rotates uploaded flat files out of the /opt/flatfiles directory.
 
-10. Edit SIPconfig.xml to make KAPA aware of the database:
+10. Rename SIPconfig.xml.example to SIPconfig.xml, then modify it to make
+KAPA aware of the database:
 
     (a) In the <accounts> block, define login information to be used by
         SIP clients.  The "institution" attribute corresponds to entries
