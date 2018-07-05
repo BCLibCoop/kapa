@@ -25,6 +25,8 @@ perl modules to run:
      XML::Simple - for parsing the config file
      UNIVERSAL::require - for loading the correct ILS interface module
      Clone - for running the test cases
+     LWP::UserAgent - for handling HTTP requests
+     JSON - for decoding JSON responses
 
 SETUP
 

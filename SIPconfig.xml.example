@@ -53,6 +53,7 @@
       <login id="SITE2"  password="SITE2"  institution="SITE2" />
       <login id="SITE3"  password="SITE3"  institution="SITE3" />
       <login id="SITE4"  password="SITE4"  institution="SITE4" />
+      <login id="SITE5"  password="SITE5"  institution="SITE5" />
   </accounts>
 
 <!-- Institution tags will hold stuff used to interface to -->
@@ -78,6 +79,9 @@
         <policy retries="3" timeout="60" />
         <config server="SITE4" db_username="freetds_user"
             db_password="password" database="freetds_db" />
+    <institution id="SITE5" implementation="KAPA::SurreyAPI">
+        <policy retries="3" timeout="60" />
+        <config server="https://libraries.surrey.ca/cards" />
     </institution> 
 </institutions>
 </acsconfig>
