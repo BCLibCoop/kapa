@@ -126,3 +126,8 @@ sub find_patron {
 	return undef;
 
 }
+
+sub check_inst_id {
+    my $self = shift;
+    return $self->{institution}->{id};
+}
