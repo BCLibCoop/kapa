@@ -99,6 +99,33 @@ KAPA aware of the database:
 SIPServer is prone to memory leaks, so you may want to schedule a nightly
 restart of KAPA.
 
+SETUP FOR SURREY API
+
+1. Install the Perl dependencies listed above.
+
+2. Install KAPA by putting the contents of this repo in /opt/SIPServer.
+
+3. Rename SIPconfig.xml.example to SIPconfig.xml, then modify it to
+authenticate patrons against the Surrey API:
+
+    (a) In the <accounts> block, define login information to be used by
+        SIP clients.  The "institution" attribute corresponds to entries
+        in the <institutions> block.  For example:
+
+        <login id="username" password="password" institution="BSUR" />
+
+        You will provide the username, password, and institution ID to your
+        vendor, along with the hostname and port to connect to the server.
+
+    (b) In the <institutions> block, add an entry for your institution as
+        follows (the institution ID should match the institution attribute
+        for your login config):
+
+        <institution id="BSUR" implementation="KAPA::SurreyAPI">
+            <policy retries="3" timeout="60" />
+            <config server="https://libraries.surrey.ca/cards" />
+        </institution>
+
 LOGGING
 
 SIPServer uses syslog() for status and debugging messages.  All
