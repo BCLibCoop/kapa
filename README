@@ -126,6 +126,12 @@ authenticate patrons against the Surrey API:
             <config server="https://libraries.surrey.ca/cards" />
         </institution>
 
+4. Start KAPA:
+
+    cd /opt/SIPServer
+    perl SIPServer.pm SIPconfig.xml > /dev/null 2>&1 & 
+    echo $! > /var/run/sip2-server.pid
+
 LOGGING
 
 SIPServer uses syslog() for status and debugging messages.  All
