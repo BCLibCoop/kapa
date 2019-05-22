@@ -14,7 +14,7 @@
 
 import os, re
 import sys
-import psycopg2
+import sqlite3
 from string import upper
 
 # So,we start by processing the subfolders in libfiles, and making a dictionary of those files
@@ -44,16 +44,16 @@ for library, files in list_of_files.iteritems():
 	print library + " records: " + str(len(all_valid_records)) + '\n'
 
 	if len(all_valid_records) != 0:
-		pg_conn = psycopg2.connect("host=localhost dbname=barcodes user=postgres password=password")
-		cur = pg_conn.cursor()
+		db_conn = sqlite3.connect("/opt/kapa/barcodes.db")
+		cur = db_conn.cursor()
 
-		cur.execute("DELETE FROM barcodes_by_symbol WHERE symbol = %s;", (upper(library), ))
-		pg_conn.commit()
+		cur.execute("DELETE FROM barcodes_by_symbol WHERE symbol = ?", upper(library))
+		db_conn.commit()
 		
 		for line in all_valid_records:
-			cur.execute("INSERT INTO barcodes_by_symbol (barcode, symbol) VALUES (%s, %s);", (line, upper(library)))
+			cur.execute("INSERT INTO barcodes_by_symbol (barcode, symbol) VALUES (?, ?)", (line, upper(library)))
 
-		pg_conn.commit()
+		db_conn.commit()
 
 		cur.close()
-		pg_conn.close()
+		db_conn.close()

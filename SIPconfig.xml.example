@@ -61,10 +61,9 @@
 <!-- needs to be one institution stanza for each institution -->
 <!-- named in the accounts above. -->
 <institutions>
-    <institution id="SITE1" implementation="KAPA::Postgres">
+    <institution id="SITE1" implementation="KAPA::SQLite">
         <policy retries="3" timeout="60" />
-        <config server="localhost" db_username="postgres"
-            db_password="password" database="barcodes" />
+        <config dbfile="/opt/kapa/barcodes.db" />
     </institution>
     <institution id="SITE2" implementation="KAPA::PatternMatch">
         <policy retries="3" timeout="60" />

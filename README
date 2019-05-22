@@ -6,7 +6,7 @@ of backend systems.
 
 In particular, KAPA can use SIP to authenticate against a list of valid
 patron barcodes.  Clients regularly upload a list to the KAPA server;
-KAPA imports the list into a local Postgres database, and then
+KAPA imports the list into a local SQLite database, and then
 authenticates against the database.
 
 KAPA also provides the ability to connect to other backends.  For
@@ -25,6 +25,7 @@ perl modules to run:
      XML::Simple - for parsing the config file
      UNIVERSAL::require - for loading the correct ILS interface module
      Clone - for running the test cases
+     DBD::SQLite - for interacting with SQLite3 database
 
 SETUP
 
@@ -33,20 +34,27 @@ of valid barcodes provided by a library.  No PIN or other personal
 information is required; the user just needs to have a barcode that is
 in the library-supplied list.
 
-1. Install the Perl dependencies listed above.
+1. Install SQLite3.  On Debian-based systems:
 
-2. Install KAPA by putting the contents of this repo in /opt/SIPServer.
+    apt install sqlite3
 
-3. Install the Postgres database server.
+2. Install the Perl dependencies listed above.  On Debian-based systems:
 
-4. Create a database named "barcodes":
+    apt install libnet-server-perl libxml-libxml-perl \
+    libxml-parser-perl libxml-simple-perl libdbd-sqlite3-perl
 
-    psql -c 'CREATE DATABASE barcodes;'
+3. Create a "kapa" user account and use it for the rest of the install
+process:
 
-5. Initialize the new database (that is, create the necessary tables and
-so on):
+    useradd -m -s /bin/bash kapa
+    su - kapa
 
-    psql -d barcodes -f postgres-db-init.sql
+4. Install KAPA by putting the contents of this repo in /opt/kapa.
+
+5. Create and initialize the new database (that is, create the necessary
+tables and so on):
+
+    sqlite3 /opt/kapa/barcodes.db < db-init.sql
 
 6. Create the /opt/flatfiles directory.  Flat files containing patron
 barcodes will go here; each file should contain a simple list of patron
@@ -59,9 +67,8 @@ flat files that have been processed by KAPA.
 8. Rename process-libraryfiles.py.example to process-libraryfiles.py,
 then edit the file:
 
-    (a) Around line 49, edit the arguments for the psycopg2.connect
-        function to use the correct hostname, username, and password for
-        your local Postgres database.
+    (a) Around line 47, ensure the arguments for the sqlite3.connect
+        function use the correct filename for your SQLite database.
 
     (b) (optional) If you want to validate the barcodes in your flat
         file based on barcode patterns (e.g. prefixes), around line 29,
@@ -69,8 +76,8 @@ then edit the file:
 
 9. Create cron jobs to periodically run the following commands:
 
-    python /opt/SIPServer/process-libraryfiles.py
-    bash /opt/SIPServer/process-libraryfiles-cleanup.sh
+    python /opt/kapa/process-libraryfiles.py
+    bash /opt/kapa/process-libraryfiles-cleanup.sh
 
 The first command grabs the contents of any files that have been
 uploaded to /opt/flatfiles, deletes any existing barcodes for that
@@ -86,11 +93,11 @@ KAPA aware of the database:
 
     (b) In the <institutions> block, add an entry for your institution.
         Use SITE1 as an example.  This is the piece that tells KAPA how
-        to connect to your local Postgres database.
+        to connect to your local SQLite database.
 
 11. Start KAPA:
 
-    cd /opt/SIPServer
+    cd /opt/kapa
     perl SIPServer.pm SIPconfig.xml > /dev/null 2>&1 & 
     echo $! > /var/run/sip2-server.pid
 
