@@ -28,7 +28,6 @@ use Net::Server::Proto;
 use IO::Socket::INET;
 use Socket;
 use Data::Dumper;		# For debugging
-require UNIVERSAL::require;
 
 #use Sip qw(readline);
 use Sip::Constants qw(:all);
