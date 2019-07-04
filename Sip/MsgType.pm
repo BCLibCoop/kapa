@@ -35,6 +35,12 @@ use Sip::Checksum qw(verify_cksum);
 
 use Data::Dumper;
 
+use KAPA::PatternMatch;
+use KAPA::SQLite;
+use KAPA::FreeTDS;
+use KAPA::EZProxy;
+use KAPA::PatronAPI;
+
 our (@ISA, @EXPORT_OK);
 
 @ISA = qw(Exporter);
@@ -847,7 +853,7 @@ sub handle_login {
 	  ->{institutions}
 	    ->{ $inst }
 	      ->{implementation};
-	$module->use;
+	$module->new();
 
 	if ($@) {
 	    syslog("LOG_ERR", "%s: Loading ILS implementation '%s' for institution '%s' failed",
